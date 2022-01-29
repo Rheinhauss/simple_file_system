@@ -116,12 +116,12 @@ public:
 	FileSys(const string& fsn);
 	~FileSys();
 
-	bool                   save() { return save(fs_name); }
+	bool                   save() { return save(fs_name); } // 按new时提供的名称保存，智能添加文件扩展名.mfsimg
 	bool                   save(string img_name);
-	static FileSys*        load(string img_name);
-	static FileSys*        newfsys(const string& fsn);
+	static FileSys*        load(string img_name);      //根据名称加载镜像，返回一个根据该镜像新创建的FileSys对象指针
+	static FileSys*        newfsys(const string& fsn); //根据名称新建镜像，返回一个根据该镜像新创建的FileSys对象指针
 	int                    mkdir(const string& fn);
-	int                    rmdir(const string& fn);
+	int                    rmdir(const string& fn); //删除文件夹
 	vector<vector<string>> ls();
 	int                    cd(const string& ss);
 	int                    create(const string& fn);
@@ -129,7 +129,7 @@ public:
 	int                    close(int fd);
 	vector<byte>           read(int fd);
 	int                    write(int fd, const string& str); //覆盖写
-	int                    del(const string& fn);
+	int                    del(const string& fn);            //删除文件
 
 	int    is_fd_open(int fd);
 	string get_cwd_str(); //方便外部读取cwd
