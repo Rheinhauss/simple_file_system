@@ -273,16 +273,7 @@ int FileSys::cd(const string& ss) {
 				std::cerr << "Error:\t already in root" << std::endl;
 				return false;
 			}
-			////更新cwd
-			//cwdFCB = FCBp(MFileImg, cwdFCB.father());;
-			////更新cwd指向的FCB
-			//auto p = cwdFCB.nodeindexs();
-			//for (int i = 0; i < FILESYS_BLK_INDEX_NUM; ++i) {
-			//	if (p[i] == 0)
-			//		FCB_in_cwd[i] = FCBp();
-			//	else
-			//		FCB_in_cwd[i] = FCBp(MFileImg, p[i]);
-			//}
+			//更新cwd和cwd内含文件的FCB缓存
 			_refresh_cwd_FCB_cache(cwdFCB.father());
 			//更新cwd路径记录
 			--cwd;
@@ -501,16 +492,8 @@ bool FileSys::_cd(const string& fn) {
 		if (s.index == 0)continue;
 		//文件名相同且为文件夹
 		if (fn == s.file_name() && s.isdir()) {
-			////更新cwd
-			//cwdFCB = s;
-			////更新cwd指向的FCB
-			//auto p = cwdFCB.nodeindexs();
-			//for (int i = 0; i < FILESYS_BLK_INDEX_NUM; ++i) {
-			//	if (p[i] == 0)
-			//		FCB_in_cwd[i] = FCBp();
-			//	else
-			//		FCB_in_cwd[i] = FCBp(MFileImg, p[i]);
-			//}
+			//更新cwd
+			//更新cwd指向的FCB
 			_refresh_cwd_FCB_cache(s.index);
 			//更新cwd路径记录
 			cwd += fn;
