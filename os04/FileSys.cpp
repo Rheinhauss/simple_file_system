@@ -3,10 +3,10 @@
 
 namespace MF
 {
-//FCB::FCB(byte* p) : FCB(p, 0) {
+//FCBp::FCBp(byte* p) : FCBp(p, 0) {
 //}
 
-FCB::FCB(byte* p, index_t ind)
+FCBp::FCBp(byte* p, index_t ind)
 	: ptr(p + ind * FILESYS_BLK_SIZE_BYTES),
 	  index(ind),
 	  p_file_name(reinterpret_cast<decltype(p_file_name)>(ptr)),
@@ -20,9 +20,9 @@ FCB::FCB(byte* p, index_t ind)
 
 }
 
-FCB::FCB(byte*      p, const index_t ind,
-         const char fn[], const byte isdir, const time_t updtime, const index_t father, uint32_t size)
-	: FCB(p, ind) {
+FCBp::FCBp(byte*      p, const index_t ind,
+           const char fn[], const byte isdir, const time_t updtime, const index_t father, uint32_t size)
+	: FCBp(p, ind) {
 	assert(strlen(fn) <= FILESYS_FILENAME_MAXLEN - 1);
 	memset(p_file_name, 0, FILESYS_FILENAME_MAXLEN);
 	memcpy(p_file_name, fn, strlen(fn) + 1);
@@ -39,39 +39,39 @@ FCB::FCB(byte*      p, const index_t ind,
 	memset(p_nodeindexs, 0, FILESYS_BLK_INDEX_NUM * sizeof(decltype(*p_nodeindexs))); //896=448*2
 }
 
-//FCB::FCB(index_t n_index, const char fn[], const byte dir, const time_t up, const index_t father, uint32_t size)
-//	: FCB(FileSys::p_curMFileImg.get() + n_index, fn, dir, up, father, size) {
+//FCBp::FCBp(index_t n_index, const char fn[], const byte dir, const time_t up, const index_t father, uint32_t size)
+//	: FCBp(FileSys::p_curMFileImg.get() + n_index, fn, dir, up, father, size) {
 //}
 //
 //
-//FCB::FCB(index_t n_index, const string& fn, const byte dir, const time_t up, const index_t father, uint32_t size)
-//	: FCB(FileSys::p_curMFileImg.get() + n_index, fn.data(), dir, up, father, size) {
+//FCBp::FCBp(index_t n_index, const string& fn, const byte dir, const time_t up, const index_t father, uint32_t size)
+//	: FCBp(FileSys::p_curMFileImg.get() + n_index, fn.data(), dir, up, father, size) {
 //}
 
-//FCB::FCB(FCB& f): ptr(f.ptr), index(f.index),
+//FCBp::FCBp(FCBp& f): ptr(f.ptr), index(f.index),
 //                  p_file_name(f.p_file_name), p_isdir(f.p_isdir), p_updtime(f.p_updtime),
 //                  p_father(f.p_father), p_size(f.p_size), p_nodeindexs(f.p_nodeindexs) {
 //
 //}
 
-//index_t FCB::find_1_avail_entrance() {
+//index_t FCBp::find_1_avail_entrance() {
 //	for (int i = 0; i < FILESYS_BLK_INDEX_NUM; ++i)
 //		if (p_nodeindexs[i] == 0)
 //			return i;
 //	//todo
 //}
 
-const char* FCB::file_name() const { return reinterpret_cast<const char*>(p_file_name); }
+const char* FCBp::file_name() const { return reinterpret_cast<const char*>(p_file_name); }
 
-void FCB::set_file_name(const char fn[]) {
+void FCBp::set_file_name(const char fn[]) {
 	memset(p_file_name, 0, 115);
 	memcpy(p_file_name, fn, strlen(fn) + 1);
 }
 
-char FCB::isdir() const { return *reinterpret_cast<const char*>(p_isdir); }
+char FCBp::isdir() const { return *reinterpret_cast<const char*>(p_isdir); }
 
 
-void FCB::set_isdir(char isdir) {
+void FCBp::set_isdir(char isdir) {
 #if MF_ASSIGN_INDEAD_OF_MEMCPY==true
 	*p_isdir = isdir;
 #else
@@ -79,9 +79,9 @@ void FCB::set_isdir(char isdir) {
 #endif
 }
 
-time_t FCB::updtime() const { return *p_updtime; }
+time_t FCBp::updtime() const { return *p_updtime; }
 
-void FCB::set_updtime(time_t updtime) {
+void FCBp::set_updtime(time_t updtime) {
 #if MF_ASSIGN_INDEAD_OF_MEMCPY==true
 	*p_updtime = updtime;
 #else
@@ -89,9 +89,9 @@ void FCB::set_updtime(time_t updtime) {
 #endif
 }
 
-index_t FCB::father() const { return *p_father; }
+index_t FCBp::father() const { return *p_father; }
 
-void FCB::set_father(index_t father) {
+void FCBp::set_father(index_t father) {
 #if MF_ASSIGN_INDEAD_OF_MEMCPY==true
 	*p_father = father;
 #else
@@ -99,9 +99,9 @@ void FCB::set_father(index_t father) {
 #endif
 }
 
-uint32_t FCB::size() const { return *p_size; }
+uint32_t FCBp::size() const { return *p_size; }
 
-void FCB::set_size(uint32_t size) {
+void FCBp::set_size(uint32_t size) {
 #if MF_ASSIGN_INDEAD_OF_MEMCPY==true
 	*p_size = size;
 #else
@@ -109,7 +109,7 @@ void FCB::set_size(uint32_t size) {
 #endif
 }
 
-index_t* FCB::nodeindexs() const { return p_nodeindexs; }
+index_t* FCBp::nodeindexs() const { return p_nodeindexs; }
 
 //shared_ptr<byte> FileSys::p_curMFileImg{};
 
@@ -146,8 +146,8 @@ FilePath& FilePath::operator--() {
 FileSys::FileSys(const string& fsn) {
 	fs_name = fsn;
 	memset(MFileImg, 0, sizeof(MFileImg));
-	//FCB_in_cwd = vector<FCB>(FILESYS_BLK_INDEX_NUM, FCB());
-	for (int i = 0; i < FILESYS_BLK_INDEX_NUM; ++i) { FCB_in_cwd[i] = FCB(); }
+	//FCB_in_cwd = vector<FCBp>(FILESYS_BLK_INDEX_NUM, FCBp());
+	for (int i = 0; i < FILESYS_BLK_INDEX_NUM; ++i) { FCB_in_cwd[i] = FCBp(); }
 	cwd += "";
 
 	//index_left_avail = 0;
@@ -155,7 +155,10 @@ FileSys::FileSys(const string& fsn) {
 	//memset(this->MFileImg, 0, sizeof(this->MFileImg));
 	//memset(this->bitmap, 0, sizeof(this->bitmap));
 	_set_blk_used(0);
-	cwdFCB = FCB(MFileImg, 0, "", true, 0, 0, 0);
+	cwdFCB = FCBp(MFileImg, 0, "", true, 0, 0, 0);
+
+	open_file_list    = vector<FCBp>(FILESYS_FD_MAX, FCBp());
+	open_file_list[0] = cwdFCB;
 }
 
 FileSys::~FileSys() {
@@ -218,7 +221,7 @@ int FileSys::mkdir(const string& fn) {
 	//	if (p[i] == 0) break;
 	//	++cnt;
 	//	if (strcmp(fn.data(), FCB_in_cwd[i].file_name())) {
-	//		std::cerr << "Error:\t this block is NOT FCB" << std::endl;
+	//		std::cerr << "Error:\t this block is NOT FCBp" << std::endl;
 	//		return -1;
 	//	}
 	//}
@@ -267,7 +270,7 @@ int FileSys::rmdir(const string& fn) {
 			_clear_blk(f.index);
 			f.index = 0;
 			//清除对应文件的FCB缓存
-			f = FCB();
+			f = FCBp();
 			return true;
 		}
 	}
@@ -299,14 +302,14 @@ int FileSys::cd(const string& ss) {
 				return false;
 			}
 			////更新cwd
-			//cwdFCB = FCB(MFileImg, cwdFCB.father());;
+			//cwdFCB = FCBp(MFileImg, cwdFCB.father());;
 			////更新cwd指向的FCB
 			//auto p = cwdFCB.nodeindexs();
 			//for (int i = 0; i < FILESYS_BLK_INDEX_NUM; ++i) {
 			//	if (p[i] == 0)
-			//		FCB_in_cwd[i] = FCB();
+			//		FCB_in_cwd[i] = FCBp();
 			//	else
-			//		FCB_in_cwd[i] = FCB(MFileImg, p[i]);
+			//		FCB_in_cwd[i] = FCBp(MFileImg, p[i]);
 			//}
 			_refresh_cwd_FCB_cache(cwdFCB.father());
 			//更新cwd路径记录
@@ -347,7 +350,8 @@ int FileSys::cd(const string& ss) {
 
 int FileSys::create(const string& fn) { return _newfile(fn, false); }
 
-bool FileSys::open(const string& fn) {
+int FileSys::open(const string& fn) {
+	int fd = 0;
 	if (!is_legal_fn(fn)) {
 		std::cerr << "Error:\t illegal file name" << std::endl;
 		return false;
@@ -357,137 +361,106 @@ bool FileSys::open(const string& fn) {
 		if (f.index == 0)continue;
 		//找到对应FCB！而且不是文件夹
 		if (f.file_name() == fn && f.isdir() == 0) {
-			//文件还未被打开?
-			for (auto& ff : open_file_list) {
+			//文件还未被打开,若打开则返回那个fd
+			for (int i = 1; i < FILESYS_FD_MAX; ++i) {
+				auto& ff = open_file_list[i];
+				if (ff.index == 0)continue;
 				if (ff.index == f.index) {
 					std::cerr << "Error:\t file is already open" << std::endl;
-					return false;
+					return i;
 				}
 			}
-			open_file_list.push_back(f);
-			return true;
-		}
-	}
-	std::cerr << "Error:\t no such file in cwd" << std::endl;
-	return false;
-}
-
-int FileSys::close(const string& fn) {
-	if (!is_legal_fn(fn)) {
-		std::cerr << "Error:\t illegal file name" << std::endl;
-		return false;
-	}
-	for (auto& f : FCB_in_cwd) {
-		//跳过空块
-		if (f.index == 0)continue;
-		//找到对应FCB！而且不是文件夹
-		if (f.file_name() == fn && f.isdir() == 0) {
-			//文件已被打开?
-			//for (auto iter = open_file_list.begin(); iter != open_file_list.end();) {
-			//	//小心迭代器失效！
-			//	if (iter->index == f.index) { iter = open_file_list.erase(iter); }
-			//	++iter;
-			//}
-			for (int i = 0; i < open_file_list.size(); ++i) {
-				if (f.index == open_file_list[i].index) {
-					open_file_list.erase(open_file_list.begin() + i);
-					return true;
+			for (int i = 1; i < FILESYS_FD_MAX; ++i) {
+				auto& ff = open_file_list[i];
+				if (ff.index == 0) {
+					ff = f;
+					return i;
 				}
 			}
 		}
 	}
 	std::cerr << "Error:\t no such file in cwd" << std::endl;
-	return false;
+	return 0;
 }
 
-vector<byte> FileSys::read(const string fn) {
-	for (const auto& s : FCB_in_cwd) {
-		//跳过空条目
-		if (s.index == 0)continue;
-		//找到对应FCB！而且不能是文件夹
-		if (fn == s.file_name() && s.isdir() == 0) {
-			//已经打开？
-			if (!_is_open(fn)) {
-				std::cerr << "Error:\t file not open" << std::endl;
-				return vector<byte>();
-			}
-			int             size = s.size();
-			vector<byte>    ret(size, 0);
-			vector<index_t> blks;
-			int             cnt = 0;
-			//一块一块读到vector<byte>里
-			for (int i = 0; i < FILESYS_BLK_INDEX_NUM; i++) {
-				index_t ind = s.nodeindexs()[i];
-				if (ind != 0) {
-					for (int i = 0; i < FILESYS_BLK_SIZE_BYTES; ++i) {
-						if (cnt < size) {
-							ret[cnt] = MFileImg[ind * FILESYS_BLK_SIZE_BYTES + i];
-							++cnt;
-						}
-						else return ret;
-					}
-				}
-			}
-
-			if (cnt < size)std::cerr << "Warning:\t file real size is NOT equal to FCB" << std::endl;
-			return ret;
-		}
-	}
-	std::cerr << "Error:\t no such path existed" << std::endl;
-	return {};
-}
-
-int FileSys::write(const string& fn, const string& str) {
-	if (!is_legal_fn(fn)) {
-		std::cerr << "Error:\t illegal file name" << std::endl;
+int FileSys::close(int fd) {
+	if (!(fd > 0 && fd < FILESYS_FD_MAX && open_file_list[fd].index != 0)) {
+		std::cerr << "Error:\t fd error" << std::endl;
 		return false;
 	}
-	for (auto& f : FCB_in_cwd) {
-		//跳过空块
-		if (f.index == 0)continue;
-		//找到对应FCB！而且不能是文件夹
-		if (f.file_name() == fn && f.isdir() == 0) {
-			//已经打开？
-			if (!_is_open(fn)) {
-				std::cerr << "Error:\t file not open" << std::endl;
-				return false;
-			}
-			size_t size = str.size() + 1;
-			//超出单文件长度限制
-			if (size > FILESYS_FILE_MAXLEN) {
-				std::cerr << "Error:\t exceed max file length" << std::endl;
-				return false;
-			}
-			//找到供写入的块
-			vector<index_t> blks;
-			while (blks.size() < std::ceil((double)size / (double)FILESYS_BLK_SIZE_BYTES)) {
-				auto t = _find_1_avail_blk_front();
-				//找不够，则返还这些块
-				if (t == 0) {
-					std::cerr << "Error:\t no enough space for this file" << std::endl;
-					for (auto i : blks)_set_blk_unused(i);
-					return false;
+	open_file_list[fd] = FCBp();
+	open_file_list[fd].index = 0;
+	return true;
+}
+
+vector<byte> FileSys::read(int fd) {
+	//fd在范围内且已经打开
+	if (!(fd > 0 && fd < FILESYS_FD_MAX && open_file_list[fd].index != 0)) {
+		std::cerr << "Error:\t fd error" << std::endl;
+		return {};
+	}
+	auto&           s    = open_file_list[fd];
+	int             size = s.size();
+	vector<byte>    ret(size, 0);
+	vector<index_t> blks;
+	int             cnt = 0;
+	//一块一块读到vector<byte>里
+	for (int i = 0; i < FILESYS_BLK_INDEX_NUM; i++) {
+		index_t ind = s.nodeindexs()[i];
+		if (ind != 0) {
+			for (int i = 0; i < FILESYS_BLK_SIZE_BYTES; ++i) {
+				if (cnt < size) {
+					ret[cnt] = MFileImg[ind * FILESYS_BLK_SIZE_BYTES + i];
+					++cnt;
 				}
-				blks.push_back(t);
-				_set_blk_used(t);
+				else return ret;
 			}
-			//FCB记录文件大小
-			f.set_size(size);
-			//依次把文件内容写入块
-			size_t now = 0, end = 0;
-			for (int i = 0; i < blks.size(); ++i) {
-				end    = std::min(now + FILESYS_BLK_SIZE_BYTES, size);
-				auto z = blks[i] * FILESYS_BLK_SIZE_BYTES;
-				//memcpy(MFileImg + z, str.data() + now, end - now);
-				for (int ii = now; ii < end; ++ii) { MFileImg[z + ii] = str[now + ii]; }
-				now               = end;
-				f.nodeindexs()[i] = blks[i];
-			}
-			return true;
 		}
 	}
-	std::cerr << "Error:\t no such file existed" << std::endl;
-	return false;
+
+	if (cnt < size)std::cerr << "Warning:\t file real size is NOT equal to FCBp" << std::endl;
+	return ret;
+}
+
+int FileSys::write(int fd, const string& str) {
+	//fd在范围内且已经打开
+	if (!(fd > 0 && fd < FILESYS_FD_MAX && open_file_list[fd].index != 0)) {
+		std::cerr << "Error:\t fd error" << std::endl;
+		return {};
+	}
+	auto& f = open_file_list[fd];
+	size_t size = str.size() + 1;
+	//超出单文件长度限制
+	if (size > FILESYS_FILE_MAXLEN) {
+		std::cerr << "Error:\t exceed max file length" << std::endl;
+		return false;
+	}
+	//找到供写入的块
+	vector<index_t> blks;
+	while (blks.size() < std::ceil((double)size / (double)FILESYS_BLK_SIZE_BYTES)) {
+		auto t = _find_1_avail_blk_front();
+		//找不够，则返还这些块
+		if (t == 0) {
+			std::cerr << "Error:\t no enough space for this file" << std::endl;
+			for (auto i : blks)_set_blk_unused(i);
+			return false;
+		}
+		blks.push_back(t);
+		_set_blk_used(t);
+	}
+	//FCB记录文件大小
+	f.set_size(size);
+	//依次把文件内容写入块
+	size_t now = 0, end = 0;
+	for (int i = 0; i < blks.size(); ++i) {
+		end    = std::min(now + FILESYS_BLK_SIZE_BYTES, size);
+		auto z = blks[i] * FILESYS_BLK_SIZE_BYTES;
+		//memcpy(MFileImg + z, str.data() + now, end - now);
+		for (int ii = now; ii < end; ++ii) { MFileImg[z + ii] = str[now + ii]; }
+		now               = end;
+		f.nodeindexs()[i] = blks[i];
+	}
+	return true;
 }
 
 int FileSys::del(const string& fn) {
@@ -526,12 +499,21 @@ int FileSys::del(const string& fn) {
 			//清除磁盘内对应文件的FCB
 			_clear_blk(f.index);
 			//清除对应文件的FCB缓存
-			f = FCB();
+			f = FCBp();
 
 			return true;
 		}
 	}
 	std::cerr << "Error:\t file not found" << std::endl;
+	return false;
+}
+
+int FileSys::is_fd_open(int fd) {
+	if (!(fd > 0 && fd < FILESYS_FD_MAX)) {
+		std::cerr << "Error:\t fd error" << std::endl;
+		return false;
+	}
+	if (open_file_list[fd].index != 0)return true;
 	return false;
 }
 
@@ -553,9 +535,9 @@ bool FileSys::_cd(const string& fn) {
 			//auto p = cwdFCB.nodeindexs();
 			//for (int i = 0; i < FILESYS_BLK_INDEX_NUM; ++i) {
 			//	if (p[i] == 0)
-			//		FCB_in_cwd[i] = FCB();
+			//		FCB_in_cwd[i] = FCBp();
 			//	else
-			//		FCB_in_cwd[i] = FCB(MFileImg, p[i]);
+			//		FCB_in_cwd[i] = FCBp(MFileImg, p[i]);
 			//}
 			_refresh_cwd_FCB_cache(s.index);
 			//更新cwd路径记录
@@ -600,31 +582,31 @@ bool FileSys::_newfile(const string& fn, bool dir) {
 	}
 	//创建新文件FCB，写入块，更新cwdFCB，并更新cwdFCB包含的条目
 	_set_blk_used(avalblk);
-	FCB_in_cwd[avalentry]          = FCB(MFileImg, avalblk, fn.data(), dir, local_time_now(), cwdFCB.index, 0);
+	FCB_in_cwd[avalentry]          = FCBp(MFileImg, avalblk, fn.data(), dir, local_time_now(), cwdFCB.index, 0);
 	cwdFCB.nodeindexs()[avalentry] = avalblk;
 	return true;
 }
 
 bool FileSys::_refresh_cwd_FCB_cache(const index_t index) {
 	//更新cwd
-	cwdFCB = FCB(MFileImg, index);;
+	cwdFCB = FCBp(MFileImg, index);;
 	//更新cwd指向的FCB
 	auto p = cwdFCB.nodeindexs();
 	for (int i = 0; i < FILESYS_BLK_INDEX_NUM; ++i) {
 		if (p[i] == 0) {
-			FCB_in_cwd[i]       = FCB();
+			FCB_in_cwd[i]       = FCBp();
 			FCB_in_cwd[i].index = 0;
 		}
 		else
-			FCB_in_cwd[i] = FCB(MFileImg, p[i]);
+			FCB_in_cwd[i] = FCBp(MFileImg, p[i]);
 	}
 	return true;
 }
 
-bool FileSys::_is_open(const string& fn) {
-	for (auto& f : open_file_list) { if (f.file_name() == fn) { return true; } }
-	return false;
-}
+//bool FileSys::_is_open(const string& fn) {
+//	for (auto& f : open_file_list) { if (f.file_name() == fn) { return true; } }
+//	return false;
+//}
 
 void FileSys::_clear_blk(const index_t index) {
 	memset(MFileImg + index * FILESYS_BLK_SIZE_BYTES, 0, FILESYS_BLK_SIZE_BYTES);
@@ -670,18 +652,18 @@ bool FileSys::is_legal_path(const string& p) {
 	else return is_legal_fn(p);
 }
 
-//利用bitmap判断块是否被占用
+
 inline bool FileSys::_is_blk_used(const index_t index) const {
 	return (bitmap[index / 8] & MASK[index % 8]) == MASK[index % 8];
 }
 
-//设置bitmap中块被占用
+
 inline void FileSys::_set_blk_used(const index_t index) { bitmap[index / 8] |= MASK[index % 8]; }
 
-//设置bitmap中块可用
+
 inline void FileSys::_set_blk_unused(const index_t index) { bitmap[index / 8] &= ~MASK[index % 8]; }
 
-//从前往后开始扫描bitmap，找到一个可用的块，找不到就返回0
+
 //todo 性能优化
 inline index_t FileSys::_find_1_avail_blk_front() {
 	for (index_t i = 1; i < FILESYS_BLKS_NUM; ++i)
@@ -690,12 +672,20 @@ inline index_t FileSys::_find_1_avail_blk_front() {
 	return 0;
 }
 
-//从后往前开始扫描bitmap，找到一个可用的块，找不到就返回0
+
 //todo 性能优化
 inline index_t FileSys::_find_next_1_blk_back() {
 	for (index_t i = FILESYS_BLKS_NUM - 1; i > 0; --i)
 		if (!_is_blk_used(i))
 			return i;
+	return 0;
+}
+
+inline int FileSys::_find_1_avail_fd() {
+	for (int i = 0; i < FILESYS_FD_MAX; ++i) {
+		if (open_file_list[i].index == 0)continue;
+		return i;
+	}
 	return 0;
 }
 }

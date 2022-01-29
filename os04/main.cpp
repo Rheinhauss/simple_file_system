@@ -87,39 +87,59 @@ int main(int argc, const char** argv) {
 					continue;
 				}
 				cin >> a;
-				ffs->open(a);
+				cout << "fd: " << ffs->open(a) << endl;
 			}
 			else if (c == "close") {
-				if (ffs == nullptr) {
-					cerr << "Error:\t no filesystem is open" << endl;
-					continue;
+				string fdstr;
+				cin >> fdstr;
+				int fd = -1;
+				if (MF::is_number(fdstr)) {
+					fd = stoi(fdstr);
+					if (ffs == nullptr) {
+						cerr << "Error:\t no filesystem is open" << endl;
+						continue;
+					}
+					ffs->close(fd);
 				}
-				cin >> a;
-				ffs->close(a);
+				else { cerr << "Error:\t fd must be a integer" << endl; }
 			}
 			else if (c == "read") {
-				cin >> a;
-				if (ffs == nullptr) {
-					cerr << "Error:\t no filesystem is open" << endl;
-					continue;
+				string fdstr;
+				cin >> fdstr;
+				int fd = -1;
+				if (MF::is_number(fdstr)) {
+					fd = stoi(fdstr);
+					if (ffs == nullptr) {
+						cerr << "Error:\t no filesystem is open" << endl;
+						continue;
+					}
+					auto ans = ffs->read(fd);
+					for (auto& ch : ans) { cout << static_cast<char>(ch); }
+					cout << endl;
 				}
-				auto ans = ffs->read(a);
-				for (auto& ch : ans) { cout << static_cast<char>(ch); }
-				cout << endl;
+				else { cerr << "Error:\t fd must be a integer" << endl; }
 			}
 			else if (c == "write") {
-				cin >> a;
-				if (ffs == nullptr) {
-					cerr << "Error:\t no filesystem is open" << endl;
-					continue;
+				string fdstr;
+				cin >> fdstr;
+				int fd = -1;
+				if (MF::is_number(fdstr)) {
+					fd = stoi(fdstr);
+					if (ffs == nullptr) {
+						cerr << "Error:\t no filesystem is open" << endl;
+						continue;
+					}
+					if (ffs->is_fd_open(fd)) {
+						cout << "Info:\t use CTRL+D (*nix) or CTRL+Z - ENTER (Windows) to end input" << endl;
+						string stmp;
+						b = "";
+						while (std::getline(std::cin, stmp)) { b += stmp; }
+						ffs->write(fd, b);
+						// 重置cin流的EOF状态
+						cin.clear();
+					}
 				}
-				cout << "Info:\t use CTRL+D (*nix) or CTRL+Z - ENTER (Windows) to end input" << endl;
-				string stmp;
-				b = "";
-				while (std::getline(std::cin, stmp)) { b += stmp; }
-				ffs->write(a, b);
-				// 重置cin流的EOF状态
-				cin.clear();
+				else { cerr << "Error:\t fd must be a integer" << endl; }
 			}
 			else if (c == "delete") {
 				cin >> a;
@@ -133,7 +153,7 @@ int main(int argc, const char** argv) {
 		}
 		if (mode == 1 && ffs != nullptr) {
 			//模仿shell刷新一个新行
-			cout << ffs->get_cwd_str() << " $ ";
+			cout << endl << ffs->get_cwd_str() << " $ ";
 		}
 	}
 }
