@@ -210,34 +210,6 @@ FileSys* FileSys::newfsys(const string& fsn) { return (new FileSys(fsn)); }
 
 int FileSys::mkdir(const string& fn) {
 	return _newfile(fn, true);
-	//if (blks_aval <= 0 || blks_aval >= FILESYS_BLKS_NUM) {
-	//	std::cerr << "Error:\t no space on this filesystem" << std::endl;
-	//	return -3;
-	//}
-	//auto    p   = cwdFCB.nodeindexs();
-	//int     cnt = 0;
-	//index_t i   = 0;
-	//for (; i < FILESYS_BLK_INDEX_NUM; ++i) {
-	//	if (p[i] == 0) break;
-	//	++cnt;
-	//	if (strcmp(fn.data(), FCB_in_cwd[i].file_name())) {
-	//		std::cerr << "Error:\t this block is NOT FCBp" << std::endl;
-	//		return -1;
-	//	}
-	//}
-	//if (cnt >= FILESYS_BLK_INDEX_NUM) {
-	//	std::cerr << "Error:\t this dir is full" << std::endl;
-	//	return -2;
-	//}
-	//if (index_left_avail == 0) {
-	//	index_left_avail = _find_1_avail_blk_front();
-	//	if (index_left_avail == 0) {
-	//		std::cerr << "Error:\t no space on this filesystem" << std::endl;
-	//		return -3;
-	//	}
-	//}
-	//_set_blk_used(index_left_avail);
-	//p[i] = index_left_avail;
 }
 
 int FileSys::rmdir(const string& fn) {
